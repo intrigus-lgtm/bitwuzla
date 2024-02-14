@@ -135,17 +135,16 @@ set(bitwuzla_src_files
 # Bitwuzla library
 
 add_library(bitwuzla ${libbitwuzla_src_files})
-target_link_libraries(bitwuzla ${LIBRARIES})
+target_link_libraries(bitwuzla ${LIBRARIES} /home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlals.a;/home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlabv.a;/home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlabb.a)
 target_include_directories(bitwuzla
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
-target_include_directories(bitwuzla PRIVATE ${Btor2Tools_INCLUDE_DIR})
+target_include_directories(bitwuzla PRIVATE ${Btor2Tools_INCLUDE_DIR} )
 target_link_libraries(bitwuzla ${Btor2Tools_LIBRARIES})
 
-target_include_directories(bitwuzla PRIVATE lib/bzla-libs/src)
-target_link_libraries(bitwuzla bzlabb bzlabv bzlals bzlarng)
+target_include_directories(bitwuzla PRIVATE /home/an/git/dev/bitwuzla/src/lib/)
 
 if(GMP_FOUND)
   target_include_directories(bitwuzla PRIVATE ${GMP_INCLUDE_DIR})

@@ -235,9 +235,9 @@ BvPropSolver::mk_node(const Node& node)
         Node child;
         if (d_use_sext && node::utils::is_bv_sext(node, child))
         {
-          res = d_ls->mk_indexed_node(bzla::ls::NodeKind::BV_SEXT,
+          res = d_ls->mk_node(bzla::ls::NodeKind::BV_SEXT,
                                       domain,
-                                      d_node_map.at(child),
+                                      {d_node_map.at(child)},
                                       {node[0].type().bv_size()});
         }
         else
@@ -250,9 +250,9 @@ BvPropSolver::mk_node(const Node& node)
       break;
     case Kind::BV_EXTRACT:
       assert(node.num_children() == 1);
-      res = d_ls->mk_indexed_node(bzla::ls::NodeKind::BV_EXTRACT,
+      res = d_ls->mk_node(bzla::ls::NodeKind::BV_EXTRACT,
                                   domain,
-                                  d_node_map.at(node[0]),
+                                  {d_node_map.at(node[0])},
                                   {node.index(0), node.index(1)});
       break;
     case Kind::BV_MUL:

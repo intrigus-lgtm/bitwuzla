@@ -190,9 +190,9 @@ PropSolverState::mk_node(BzlaNode *node)
       if (d_use_sext && bzla_exp_is_bv_sext(d_bzla, node))
       {
         res =
-            d_ls->mk_indexed_node(bzla::ls::NodeKind::BV_SEXT,
+            d_ls->mk_node(bzla::ls::NodeKind::BV_SEXT,
                                   domain,
-                                  d_node_map.at(node->e[1]),
+                                  {d_node_map.at(node->e[1])},
                                   {bzla_node_bv_get_width(d_bzla, node->e[0])});
       }
       else
@@ -226,9 +226,9 @@ PropSolverState::mk_node(BzlaNode *node)
       break;
     case BZLA_BV_SLICE_NODE:
       assert(node->arity == 1);
-      res = d_ls->mk_indexed_node(bzla::ls::NodeKind::BV_EXTRACT,
+      res = d_ls->mk_node(bzla::ls::NodeKind::BV_EXTRACT,
                                   domain,
-                                  d_node_map.at(node->e[0]),
+                                  {d_node_map.at(node->e[0])},
                                   {bzla_node_bv_slice_get_upper(node),
                                    bzla_node_bv_slice_get_lower(node)});
       break;
