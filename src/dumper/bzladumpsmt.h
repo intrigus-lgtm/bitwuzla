@@ -21,6 +21,9 @@ void bzla_dumpsmt_dump_node(Bzla* bzla,
                             BzlaNode* node,
                             uint32_t depth);
 
+void
+bzla_dumpsmt_dump_node_with_formula(Bzla *bzla, FILE *file, BzlaNode *exp);
+
 void bzla_dumpsmt_dump(Bzla* bzla, FILE* file);
 
 void bzla_dumpsmt_dump_const_bv_value(Bzla* bzla,

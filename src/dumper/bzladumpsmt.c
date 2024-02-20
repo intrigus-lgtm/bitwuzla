@@ -2034,6 +2034,15 @@ bzla_dumpsmt_dump(Bzla *bzla, FILE *file)
 }
 
 void
+bzla_dumpsmt_dump_node_with_formula(Bzla *bzla, FILE *file, BzlaNode *exp)
+{
+  assert(bzla);
+  assert(file);
+  BzlaNode *roots[1] = {exp};
+  dump_smt_aux(bzla, file, roots, 1);
+}
+
+void
 bzla_dumpsmt_dump_node(Bzla *bzla, FILE *file, BzlaNode *exp, uint32_t depth)
 {
   assert(bzla);
