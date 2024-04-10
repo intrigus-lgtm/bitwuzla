@@ -29,7 +29,7 @@ class BvBitblastSolver : public Solver
   void bitblast(const Node& term);
 
   /** Return encoded bits associated with bit-blasted term. */
-  const bb::AigBitblaster::Bits& bits(const Node& term) const;
+  const bitblast::AigBitblaster::Bits& bits(const Node& term) const;
 
  private:
   /** Sat interface used for d_cnf_encoder. */
@@ -42,11 +42,11 @@ class BvBitblastSolver : public Solver
   backtrack::vector<Node> d_assumptions;
 
   /** AIG Bit-blaster. */
-  bb::AigBitblaster d_bitblaster;
+  bitblast::AigBitblaster d_bitblaster;
   /** Cached to store bit-blasted terms and their encoded bits. */
-  std::unordered_map<Node, bb::AigBitblaster::Bits> d_bitblaster_cache;
+  std::unordered_map<Node, bitblast::AigBitblaster::Bits> d_bitblaster_cache;
   /** CNF encoder for AIGs. */
-  std::unique_ptr<bb::AigCnfEncoder> d_cnf_encoder;
+  std::unique_ptr<bitblast::AigCnfEncoder> d_cnf_encoder;
   /** SAT solver used for solving bit-blasted formula. */
   std::unique_ptr<sat::SatSolver> d_sat_solver;
   /** SAT solver interface for CNF encoder, which wraps `d_sat_solver`. */

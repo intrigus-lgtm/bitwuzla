@@ -13,7 +13,7 @@ namespace bzla::bv {
 using namespace bzla::node;
 
 /** Sat solver wrapper for AIG encoder. */
-class BvBitblastSolver::BitblastSatSolver : public bb::SatInterface
+class BvBitblastSolver::BitblastSatSolver : public bitblast::SatInterface
 {
  public:
   BitblastSatSolver(sat::SatSolver& solver) : d_solver(solver) {}
@@ -47,7 +47,7 @@ BvBitblastSolver::BvBitblastSolver(SolvingContext& context)
 {
   d_sat_solver.reset(new sat::Cadical());
   d_bitblast_sat_solver.reset(new BitblastSatSolver(*d_sat_solver));
-  d_cnf_encoder.reset(new bb::AigCnfEncoder(*d_bitblast_sat_solver));
+  d_cnf_encoder.reset(new bitblast::AigCnfEncoder(*d_bitblast_sat_solver));
 }
 
 BvBitblastSolver::~BvBitblastSolver() {}
@@ -124,7 +124,7 @@ BvBitblastSolver::bitblast(const Node& t)
     auto it = d_bitblaster_cache.find(cur);
     if (it == d_bitblaster_cache.end())
     {
-      d_bitblaster_cache.emplace(cur, bb::AigBitblaster::Bits());
+      d_bitblaster_cache.emplace(cur, bitblast::AigBitblaster::Bits());
       if (!BvSolver::is_leaf(cur))
       {
         visit.insert(visit.end(), cur.begin(), cur.end());
@@ -346,7 +346,7 @@ BvBitblastSolver::bitblast(const Node& t)
   } while (!visit.empty());
 }
 
-const bb::AigBitblaster::Bits&
+const bitblast::AigBitblaster::Bits&
 BvBitblastSolver::bits(const Node& term) const
 {
   assert(d_bitblaster_cache.find(term) != d_bitblaster_cache.end());

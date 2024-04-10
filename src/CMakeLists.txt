@@ -135,7 +135,12 @@ set(bitwuzla_src_files
 # Bitwuzla library
 
 add_library(bitwuzla ${libbitwuzla_src_files})
-target_link_libraries(bitwuzla ${LIBRARIES} /home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlals.a;/home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlabv.a;/home/an/git/dev/bitwuzla/build/install/lib/libbitwuzlabb.a)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+target_link_libraries(bitwuzla ${LIBRARIES} /home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-debug/lib/libbitwuzlals.a;/home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-debug/lib/libbitwuzlabv.a;/home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-debug/lib/libbitwuzlabb.a)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Production")
+target_link_libraries(bitwuzla ${LIBRARIES} /home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-production/lib/libbitwuzlals.a;/home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-production/lib/libbitwuzlabv.a;/home/an/git/dev/bitwuzla/wt-dev-bzla-libs/install-production/lib/libbitwuzlabb.a)
+endif()
 target_include_directories(bitwuzla
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

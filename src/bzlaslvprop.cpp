@@ -26,7 +26,7 @@ extern "C" {
 }
 
 #include "bv/bitvector.h"
-#include "ls/bv/bitvector_domain.h"
+#include "bv/domain/bitvector_domain.h"
 #include "ls/ls_bv.h"
 
 struct BzlaPropSolver;
@@ -60,7 +60,8 @@ class PropSolverState
     d_ls.reset(new bzla::ls::LocalSearchBV(
         bzla_opt_get(d_bzla, BZLA_OPT_PROP_NPROPS),
         bzla_opt_get(d_bzla, BZLA_OPT_PROP_NUPDATES),
-        bzla_opt_get(d_bzla, BZLA_OPT_SEED)));
+        bzla_opt_get(d_bzla, BZLA_OPT_SEED),
+        bzla_opt_get(d_bzla, BZLA_OPT_LOGLEVEL)));
 
     d_ls->d_options.use_ineq_bounds =
         bzla_opt_get(d_bzla, BZLA_OPT_PROP_INFER_INEQ_BOUNDS);
@@ -81,7 +82,6 @@ class PropSolverState
     d_ls->d_options.prob_pick_ess_input =
         1000 - bzla_opt_get(d_bzla, BZLA_OPT_PROP_PROB_RANDOM_INPUT);
 
-    d_ls->set_log_level(bzla_opt_get(d_bzla, BZLA_OPT_LOGLEVEL));
     d_ls->init();
   }
 
@@ -143,7 +143,7 @@ PropSolverState::mk_node(BzlaNode *node)
     }
   }
 
-  bzla::ls::BitVectorDomain domain(bw);
+  BitVectorDomain domain(bw);
 
   if (node->av)
   {
@@ -391,9 +391,9 @@ PropSolverState::print_progress() const
            nroots_total - nroots_unsat,
            nroots_total,
            (double) (nroots_total - nroots_unsat) / nroots_total * 100,
-           d_ls->d_statistics.d_nmoves,
-           d_ls->d_statistics.d_nprops,
-           d_ls->d_statistics.d_nupdates);
+           d_ls->num_moves(),
+           d_ls->num_props(),
+           d_ls->num_updates());
 }
 
 BzlaSolverResult
@@ -413,13 +413,13 @@ PropSolverState::check_sat()
 
   if (nprops)
   {
-    nprops += d_ls->d_statistics.d_nprops;
+    nprops += d_ls->num_props();
     d_ls->set_max_nprops(nprops);
     BZLA_MSG(d_bzla->msg, 1, "Set propagation limit to %zu", nprops);
   }
   if (nupdates)
   {
-    nupdates += d_ls->d_statistics.d_nupdates;
+    nupdates += d_ls->num_updates();
     d_ls->set_max_nupdates(nupdates);
     BZLA_MSG(d_bzla->msg, 1, "Set model update limit to %zu", nupdates);
   }
@@ -445,8 +445,8 @@ PropSolverState::check_sat()
   for (uint32_t j = 0;; ++j)
   {
     if (bzla_terminate(d_bzla)
-        || (nprops && d_ls->d_statistics.d_nprops >= nprops)
-        || (nupdates && d_ls->d_statistics.d_nupdates >= nupdates))
+        || (nprops && d_ls->num_props() >= nprops)
+        || (nupdates && d_ls->num_updates() >= nupdates))
     {
       assert(sat_result == BZLA_RESULT_UNKNOWN);
       goto DONE;
@@ -511,9 +511,9 @@ PropSolverState::generate_model()
 void
 PropSolverState::print_statistics()
 {
-  uint64_t nmoves   = d_ls->d_statistics.d_nmoves;
-  uint64_t nprops   = d_ls->d_statistics.d_nprops;
-  uint64_t nupdates = d_ls->d_statistics.d_nupdates;
+  uint64_t nmoves   = d_ls->num_moves();
+  uint64_t nprops   = d_ls->num_props();
+  uint64_t nupdates = d_ls->num_updates();
 
   BZLA_MSG(d_bzla->msg, 1, "");
   BZLA_MSG(d_bzla->msg, 1, "moves: %u", nmoves);
@@ -524,28 +524,29 @@ PropSolverState::print_statistics()
            "moves per second: %.1f",
            (double) nmoves / d_time_statistics.d_check_sat);
   BZLA_MSG(d_bzla->msg, 1, "propagation steps: %u", nprops);
-  BZLA_MSG(d_bzla->msg,
-           1,
-           "    inverse value propagations: %u",
-           d_ls->d_statistics.d_nprops_inv);
-  BZLA_MSG(d_bzla->msg,
-           1,
-           "    consistent value propagations: %u",
-           d_ls->d_statistics.d_nprops_cons);
+  //BZLA_MSG(d_bzla->msg,
+  //         1,
+  //         "    inverse value propagations: %u",
+  //         d_ls->d_statistics.d_nprops_inv);
+  //BZLA_MSG(d_bzla->msg,
+  //         1,
+  //         "    consistent value propagations: %u",
+  //         d_ls->d_statistics.d_nprops_cons);
   BZLA_MSG(d_bzla->msg,
            1,
            "propagation steps per second: %.1f",
            (double) nprops / d_time_statistics.d_check_sat);
-  BZLA_MSG(d_bzla->msg,
-           1,
-           "propagation conflicts (non-recoverable): %u",
-           d_ls->d_statistics.d_nconf_total);
+  //BZLA_MSG(d_bzla->msg,
+  //         1,
+  //         "propagation conflicts (non-recoverable): %u",
+  //         d_ls->d_statistics.d_nconf_total);
   BZLA_MSG(d_bzla->msg, 1, "cone updates: %u", nupdates);
   BZLA_MSG(d_bzla->msg,
            1,
            "updates per second: %.1f",
            (double) nupdates / d_time_statistics.d_check_sat);
-#ifndef NDEBUG
+//#ifndef NDEBUG
+#if 0
   BZLA_MSG(d_bzla->msg, 1, "");
   BZLA_MSG(d_bzla->msg, 1, "conflicts:");
   for (const auto &p : d_ls->d_statistics.d_nconf)

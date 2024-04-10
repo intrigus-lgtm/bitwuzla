@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "ls/bv/bitvector_domain.h"
+#include "bv/domain/bitvector_domain.h"
 #include "ls/ls_bv.h"
 #include "node/node_manager.h"
 #include "node/node_utils.h"
@@ -23,7 +23,7 @@ BvPropSolver::BvPropSolver(SolvingContext& context, BvBitblastSolver& bb_solver)
   const option::Options& options = d_context.options();
 
   d_ls.reset(new ls::LocalSearchBV(
-      options.prop_nprops(), options.prop_nupdates(), options.seed()));
+      options.prop_nprops(), options.prop_nupdates(), options.seed(), options.log_level()));
 
   d_ls->d_options.use_ineq_bounds        = options.prop_ineq_bounds();
   d_ls->d_options.use_opt_lt_concat_sext = options.prop_opt_lt_concat_sext();
@@ -34,7 +34,6 @@ BvPropSolver::BvPropSolver(SolvingContext& context, BvBitblastSolver& bb_solver)
   d_ls->d_options.prob_pick_ess_input =
       1000 - options.prop_prob_pick_random_input();
 
-  d_ls->set_log_level(options.log_level());
   d_ls->init();
 
   d_use_sext       = options.prop_sext();
@@ -57,10 +56,10 @@ BvPropSolver::check()
   uint32_t progress_steps_inc = progress_steps * 10;
 
   // incremental: increase limit by given nprops/nupdates
-  nprops += d_ls->d_statistics.d_nprops;
+  nprops += d_ls->num_props();
   d_ls->set_max_nprops(nprops);
   // BZLA_MSG(d_bzla->msg, 1, "Set propagation limit to %zu", nprops);
-  nupdates += d_ls->d_statistics.d_nupdates;
+  nupdates += d_ls->num_updates();
   d_ls->set_max_nupdates(nupdates);
   // BZLA_MSG(d_bzla->msg, 1, "Set model update limit to %zu", nupdates);
 
@@ -69,8 +68,8 @@ BvPropSolver::check()
   for (uint32_t j = 0;; ++j)
   {
     // TODO add termination condition call
-    if ((nprops && d_ls->d_statistics.d_nprops >= nprops)
-        || (nupdates && d_ls->d_statistics.d_nupdates >= nupdates))
+    if ((nprops && d_ls->num_props() >= nprops)
+        || (nupdates && d_ls->num_updates() >= nupdates))
     {
       assert(sat_result == Result::UNKNOWN);
       goto DONE;
@@ -178,7 +177,7 @@ BvPropSolver::mk_node(const Node& node)
   uint64_t res  = 0;
   uint64_t size = node.type().is_bool() ? 1 : node.type().bv_size();
 
-  bzla::ls::BitVectorDomain domain(size);
+  BitVectorDomain domain(size);
 
   if (node.is_value())
   {
