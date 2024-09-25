@@ -12,7 +12,6 @@
 
 #include "bv/bitvector.h"
 #include "node/node_manager.h"
-#include "node/node_utils.h"
 #include "rewrite/rewrite_utils.h"
 
 namespace bzla {
